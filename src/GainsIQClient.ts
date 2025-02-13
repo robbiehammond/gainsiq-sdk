@@ -45,7 +45,7 @@ export class GainsIQClient {
   async logWorkoutSet(data: {
     exercise: string;
     reps: string;
-    setNumber: number;
+    sets: number;
     weight: number;
   }): Promise<{ success: boolean }> {
     return this.request<{ success: boolean }>("/sets/log", {
@@ -67,7 +67,7 @@ export class GainsIQClient {
     timestamp: number;
     exercise: string;
     reps: string;
-    setNumber: number;
+    sets: number;
     weight: number;
   }): Promise<{ success: boolean }> {
     return this.request<{ success: boolean }>("/sets/edit", {
@@ -111,5 +111,9 @@ export class GainsIQClient {
   // === Analysis endpoint ===
   async generateAnalysis(): Promise<any> {
     return this.request<any>("/analysis", { method: "POST" });
+  }
+
+  async fetchAnalysis(): Promise<any> {
+    return this.request<any>("/analysis", { method: "GET" });
   }
 }

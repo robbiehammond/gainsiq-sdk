@@ -63,7 +63,7 @@ describe("GainsIQClient", () => {
       const setData = {
         exercise: "Bench Press",
         reps: "10",
-        setNumber: 3,
+        sets: 3,
         weight: 225.0,
       };
       (fetch as jest.Mock).mockResolvedValue({
@@ -128,7 +128,7 @@ describe("GainsIQClient", () => {
         exercise: "Bench press",
         timestamp: 1698787200,
         reps: "12",
-        setNumber: 4,
+        sets: 4,
         weight: 230.0,
       };
       (fetch as jest.Mock).mockResolvedValue({
