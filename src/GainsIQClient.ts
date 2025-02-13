@@ -1,40 +1,115 @@
+// GainsIQClient.ts
 import { AddSetRequest, AddSetResponse, WorkoutSet } from "./types";
 
 export class GainsIQClient {
-    private apiUrl: string;
-  
-    constructor(apiUrl: string, authToken?: string) {
-      this.apiUrl = apiUrl;
-    }
-  
-    private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-      const headers = new Headers(options.headers);
-      headers.set("Content-Type", "application/json");
-  
-      const response = await fetch(`${this.apiUrl}${endpoint}`, {
-        ...options,
-        headers,
-      });
-  
-      if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
-      }
-  
-      return response.json();
-    }
-  
-    async getWorkoutSets(): Promise<WorkoutSet[]> {
-      return this.request<WorkoutSet[]>("/workout-sets");
-    }
-  
-    async addWorkoutSet(data: AddSetRequest): Promise<AddSetResponse> {
-      return this.request<AddSetResponse>("/workout-sets", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    }
-  
-    async deleteWorkoutSet(setId: string): Promise<void> {
-      await this.request(`/workout-sets/${setId}`, { method: "DELETE" });
-    }
+  private apiUrl: string;
+  private authToken?: string;
+
+  constructor(apiUrl: string, authToken?: string) {
+    this.apiUrl = apiUrl;
+    this.authToken = authToken;
   }
+
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const headers = new Headers(options.headers);
+    headers.set("Content-Type", "application/json");
+    if (this.authToken) {
+      headers.set("Authorization", `Bearer ${this.authToken}`);
+    }
+
+    const response = await fetch(`${this.apiUrl}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  // === Exercises endpoints ===
+  async getExercises(): Promise<string[]> {
+    return this.request<string[]>("/exercises", { method: "GET" });
+  }
+
+  async addExercise(exerciseName: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("/exercises", {
+      method: "POST",
+      body: JSON.stringify({ exercise_name: exerciseName }),
+    });
+  }
+
+  // === Workout sets endpoints ===
+  async logWorkoutSet(data: {
+    exercise: string;
+    reps: string;
+    setNumber: number;
+    weight: number;
+  }): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("/sets/log", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async popLastSet(): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/sets/pop", { method: "POST" });
+  }
+
+  async getLastMonthWorkouts(): Promise<WorkoutSet[]> {
+    return this.request<WorkoutSet[]>("/sets/last_month", { method: "GET" });
+  }
+
+  async editSet(payload: {
+    workoutId: string;
+    timestamp: number;
+    exercise: string;
+    reps: string;
+    setNumber: number;
+    weight: number;
+  }): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("/sets/edit", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async deleteSet(payload: { workoutId: string; timestamp: number }): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("/sets", {
+      method: "DELETE",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getSetsByExercise(params: { exerciseName: string; start: number; end: number }): Promise<WorkoutSet[]> {
+    const queryParams = new URLSearchParams({
+      exerciseName: params.exerciseName,
+      start: params.start.toString(),
+      end: params.end.toString(),
+    }).toString();
+    return this.request<WorkoutSet[]>(`/sets/by_exercise?${queryParams}`, { method: "GET" });
+  }
+
+  // === Weight endpoints ===
+  async getWeights(): Promise<{ weight: number; timestamp: string }[]> {
+    return this.request<{ weight: number; timestamp: string }[]>("/weight", { method: "GET" });
+  }
+
+  async logWeight(weight: number): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("/weight", {
+      method: "POST",
+      body: JSON.stringify({ weight }),
+    });
+  }
+
+  async deleteMostRecentWeight(): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/weight", { method: "DELETE" });
+  }
+
+  // === Analysis endpoint ===
+  async generateAnalysis(): Promise<any> {
+    return this.request<any>("/analysis", { method: "POST" });
+  }
+}
