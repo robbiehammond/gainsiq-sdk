@@ -1,6 +1,6 @@
 {
   "name": "gainsiq-sdk",
-  "version": "1.0.10",
+  "version": "1.0.16",
   "main": "dist/gainsiq-sdk.cjs.js",
   "module": "dist/gainsiq-sdk.esm.js",
   "types": "dist/index.d.ts",

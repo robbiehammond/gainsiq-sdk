@@ -3,18 +3,18 @@ import { AddSetRequest, AddSetResponse, WorkoutSet } from "./types";
 
 export class GainsIQClient {
   private apiUrl: string;
-  private authToken?: string;
+  private apiKey?: string;
 
-  constructor(apiUrl: string, authToken?: string) {
+  constructor(apiUrl: string, apiKey?: string) {
     this.apiUrl = apiUrl;
-    this.authToken = authToken;
+    this.apiKey = apiKey;
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers = new Headers(options.headers);
     headers.set("Content-Type", "application/json");
-    if (this.authToken) {
-      headers.set("Authorization", `Bearer ${this.authToken}`);
+    if (this.apiKey) {
+      headers.set("x-api-key", this.apiKey)
     }
 
     const response = await fetch(`${this.apiUrl}${endpoint}`, {
