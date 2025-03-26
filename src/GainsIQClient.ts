@@ -47,6 +47,7 @@ export class GainsIQClient {
     reps: string;
     sets: number;
     weight: number;
+    isCutting: boolean;
   }): Promise<{ success: boolean }> {
     return this.request<{ success: boolean }>("/sets/log", {
       method: "POST",

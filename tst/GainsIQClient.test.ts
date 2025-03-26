@@ -65,6 +65,7 @@ describe("GainsIQClient", () => {
         reps: "10",
         sets: 3,
         weight: 225.0,
+        isCutting: false
       };
       (fetch as jest.Mock).mockResolvedValue({
         ok: true,
